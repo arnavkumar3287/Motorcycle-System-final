@@ -1,0 +1,33 @@
+name: motorcycle_system_hub
+description: "AI-Driven Telemetry, Adaptive Shift Intelligence & Safety Ecosystem for Triumph Scrambler 400x"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  provider: ^6.1.1
+  flutter_blue_plus: ^1.31.14
+  sensors_plus: ^5.0.1
+  geolocator: ^11.0.0
+  fl_chart: ^0.68.0
+  shared_preferences: ^2.2.2
+  csv: ^6.0.0
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+    - assets/cep_telemetry_prototype_dataset.csv
+    - assets/edge_intelligence_weights.json
+    - assets/cep_shift_model.tflite

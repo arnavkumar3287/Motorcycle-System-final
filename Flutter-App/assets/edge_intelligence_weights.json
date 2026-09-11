@@ -1,0 +1,83 @@
+{
+  "model_metadata": {
+    "name": "CEP Motorcycle System Edge Intelligence",
+    "version": "1.0.0",
+    "motorcycle": "Triumph Scrambler 400x",
+    "buffer_rpm": 250,
+    "lugging_rpm_limit": 2500,
+    "lugging_load_limit": 50.0,
+    "cold_tire_temp_limit_c": 25.0,
+    "extreme_lean_limit_deg": 25.0,
+    "sos_g_force_spike": 4.5,
+    "sos_lean_angle_limit_deg": 85.0
+  },
+  "k_means_profiler": {
+    "features": [
+      "throttle_pos_pct",
+      "engine_rpm",
+      "vehicle_speed_kmh",
+      "lateral_accel_g",
+      "longitudinal_accel_g"
+    ],
+    "means": {
+      "throttle_pos_pct": 41.242419999999996,
+      "engine_rpm": 4882.36427,
+      "vehicle_speed_kmh": 69.61577,
+      "lateral_accel_g": 0.156172,
+      "longitudinal_accel_g": 0.184642
+    },
+    "stds": {
+      "throttle_pos_pct": 20.801281063265964,
+      "engine_rpm": 1424.1135377388996,
+      "vehicle_speed_kmh": 26.05388471606451,
+      "lateral_accel_g": 0.11685782811262205,
+      "longitudinal_accel_g": 0.11635663162266367
+    },
+    "cluster_centers": [
+      [
+        -0.7406049032427654,
+        -0.7374044197156381,
+        -0.6438060522372958,
+        -0.27793605085683476,
+        -0.6989517195391398
+      ],
+      [
+        1.5749050860603546,
+        1.4368775191312153,
+        1.1570248656529931,
+        1.416196859230219,
+        1.4500640536082021
+      ],
+      [
+        0.2815956585857412,
+        0.34651325436727487,
+        0.3516547244017869,
+        -0.3101962054917974,
+        0.284035363575013
+      ]
+    ],
+    "cluster_mapping": {
+      "0": 0,
+      "2": 1,
+      "1": 2
+    }
+  },
+  "regression_benchmarks": {
+    "features": [
+      "engine_load_pct",
+      "throttle_pos_pct",
+      "road_incline_deg",
+      "current_gear"
+    ],
+    "rmse": 541.0674076779391,
+    "r2": 0.8303607370955313,
+    "baseline_curve": {
+      "1": 4600.0,
+      "2": 5600.0,
+      "3": 6200.0,
+      "4": 6500.0,
+      "5": 6800.0,
+      "6": 7200.0
+    }
+  }
+}

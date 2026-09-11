@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Motorcycle Edge-AI Telemetry & Safety Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@500;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="status-beacon"></div>
+        <div class="header-title">
+          <h1>EDGE-AI COCKPIT HUB</h1>
+          <span class="subtitle">TRIUMPH SCRAMBLER 400X • EURO 5 CAN BUS</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="profile-badge" id="riderProfileBadge">🌱 ECO COMMUTER</div>
+      </div>
+    </header>
+
+    <!-- Navigation Bar -->
+    <nav class="cockpit-nav">
+      <button class="nav-btn active" data-tab="hud">Cockpit HUD</button>
+      <button class="nav-btn" data-tab="analytics">Ride Score</button>
+      <button class="nav-btn" data-tab="ubi">UBI Risk</button>
+      <button class="nav-btn" data-tab="maintenance">Maintenance</button>
+      <button class="nav-btn" data-tab="blackbox">SOS Blackbox</button>
+    </nav>
+
+    <!-- TAB 1: COCKPIT HUD -->
+    <main id="tab-hud" class="tab-content active">
+      <!-- Dynamic Shift Cue Banner -->
+      <div class="shift-banner hold" id="shiftBanner">
+        <span class="shift-icon" id="shiftIcon">🟢</span>
+        <span class="shift-text" id="shiftText">HOLD GEAR</span>
+      </div>
+
+      <!-- Hazard Alert Banner -->
+      <div class="hazard-alert-banner" id="hazardAlert" style="display: none;">
+        <span class="hazard-icon">⚠️</span>
+        <span class="hazard-msg" id="hazardMessage">Extreme Lean Angle on Cold Tires!</span>
+      </div>
+
+      <!-- Center Cockpit Display -->
+      <div class="cockpit-center">
+        <!-- Tachometer Gauge -->
+        <div class="gauge-container">
+          <canvas id="tachometerCanvas" width="300" height="300"></canvas>
+          <div class="gauge-readout">
+            <div class="gear-display" id="gearDisplay">GEAR 3</div>
+            <div class="rpm-display" id="rpmDisplay">4,500</div>
+            <div class="rpm-label">RPM</div>
+            <div class="target-rpm-badge" id="targetRpmBadge">TARGET: 5,800 RPM</div>
+          </div>
+        </div>
+
+        <!-- Telemetry Metrics Grid -->
+        <div class="telemetry-grid">
+          <div class="metric-card">
+            <div class="metric-label">VEHICLE SPEED</div>
+            <div class="metric-val-row">
+              <span class="metric-value" id="speedVal">72.4</span>
+              <span class="metric-unit">KM/H</span>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">ENGINE LOAD</div>
+            <div class="metric-val-row">
+              <span class="metric-value highlight-amber" id="loadVal">48%</span>
+              <span class="metric-unit">LOAD</span>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">THROTTLE (TPS)</div>
+            <div class="metric-val-row">
+              <span class="metric-value highlight-green" id="throttleVal">38%</span>
+              <span class="metric-unit">POS</span>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">ROAD INCLINE</div>
+            <div class="metric-val-row">
+              <span class="metric-value highlight-purple" id="inclineVal">+1.2°</span>
+              <span class="metric-unit">SLOPE</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IMU Lean Angle & TPMS Row -->
+      <div class="sensors-row">
+        <!-- Lean Angle Visualizer -->
+        <div class="lean-card">
+          <div class="card-header-row">
+            <span class="card-title">6-AXIS IMU LEAN ANGLE</span>
+            <span class="lean-badge" id="leanBadge">14.2° RIGHT</span>
+          </div>
+          <canvas id="leanCanvas" width="280" height="70"></canvas>
+        </div>
+
+        <!-- BLE TPMS Tires -->
+        <div class="tpms-card">
+          <div class="card-header-row">
+            <span class="card-title">BLE TPMS TIRE SENSORS</span>
+            <span class="tpms-status">ACTIVE (10Hz)</span>
+          </div>
+          <div class="tpms-tires-grid">
+            <div class="tire-box" id="frontTireBox">
+              <div class="tire-name">FRONT TIRE</div>
+              <div class="tire-val"><span id="frontPsi">29.8</span> <small>PSI</small></div>
+              <div class="tire-temp"><span id="frontTemp">23.2</span>°C <span class="cold-tag" id="frontColdTag">COLD</span></div>
+            </div>
+            <div class="tire-box" id="rearTireBox">
+              <div class="tire-name">REAR TIRE</div>
+              <div class="tire-val"><span id="rearPsi">32.4</span> <small>PSI</small></div>
+              <div class="tire-temp"><span id="rearTemp">24.1</span>°C <span class="cold-tag" id="rearColdTag">COLD</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Replay Streamer Controller -->
+      <div class="streamer-card">
+        <div class="streamer-header">
+          <span class="streamer-title">10,000-ROW PROTOTYPE TELEMETRY STREAM</span>
+          <span class="frame-counter" id="frameCounter">Frame: 0 / 10000</span>
+        </div>
+        <div class="streamer-controls">
+          <button id="btnPlayPause" class="ctrl-btn main-ctrl">⏸ PAUSE</button>
+          <button id="btnReset" class="ctrl-btn">⏮ RESTART</button>
+          <input type="range" id="seekSlider" min="0" max="9999" value="0" class="seek-bar" />
+          <div class="speed-btns">
+            <button class="speed-btn active" data-speed="1">1x</button>
+            <button class="speed-btn" data-speed="2">2x</button>
+            <button class="speed-btn" data-speed="5">5x</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- TAB 2: POST-RIDE ANALYTICS -->
+    <main id="tab-analytics" class="tab-content">
+      <div class="score-card">
+        <span class="score-title">GAMIFIED RIDE SCORE</span>
+        <div class="score-circle">
+          <span class="score-number" id="overallScoreNum">--</span>
+          <span class="score-denom">/ 100</span>
+        </div>
+        <div class="score-verdict" id="scoreVerdict">Streaming Telemetry Packets...</div>
+      </div>
+
+      <div class="sub-scores-grid">
+        <div class="sub-score-box">
+          <span class="sub-title">Shift Efficiency</span>
+          <span class="sub-val highlight-green" id="subShift">--</span>
+        </div>
+        <div class="sub-score-box">
+          <span class="sub-title">Safety Adherence</span>
+          <span class="sub-val highlight-cyan" id="subSafety">--</span>
+        </div>
+        <div class="sub-score-box">
+          <span class="sub-title">Smoothness</span>
+          <span class="sub-val highlight-purple" id="subSmooth">--</span>
+        </div>
+      </div>
+
+      <div class="section-title">FUEL & TRANSMISSION DEGRADING HABITS</div>
+      <div class="habits-list">
+        <div class="habit-item">
+          <div class="habit-header">
+            <span class="habit-name">Engine Lugging (&lt;2,500 RPM @ &gt;50% Load)</span>
+            <span class="habit-badge badge-safe" id="luggingBadge">0 Events</span>
+          </div>
+          <p class="habit-desc">Destructive low-speed cylinder knock on 400cc single cylinder; downshift required.</p>
+        </div>
+        <div class="habit-item">
+          <div class="habit-header">
+            <span class="habit-name">Excessive Revving (&gt;7,500 RPM)</span>
+            <span class="habit-badge badge-safe" id="overRevBadge">0 Events</span>
+          </div>
+          <p class="habit-desc">Revving beyond optimal torque peak wastes fuel and accelerates thermal breakdown.</p>
+        </div>
+        <div class="habit-item">
+          <div class="habit-header">
+            <span class="habit-name">Aggressive Corner Exit Roll-On</span>
+            <span class="habit-badge badge-safe" id="cornerExitBadge">0 Events</span>
+          </div>
+          <p class="habit-desc">Sudden throttle roll-on at lean angles &gt; 15° increases rear traction slip risk.</p>
+        </div>
+        <div class="habit-item">
+          <div class="habit-header">
+            <span class="habit-name">Cold Tire Lean Maneuvers</span>
+            <span class="habit-badge badge-safe" id="coldTireBadge">0 Flags</span>
+          </div>
+          <p class="habit-desc">Deep lean angle before tire rubber reaches 25°C optimal operating temperature.</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- TAB 3: UBI RISK PROFILING -->
+    <main id="tab-ubi" class="tab-content">
+      <div class="ubi-tier-card safe" id="ubiTierCard">
+        <div class="tier-tag">SAFE COMMUTER • TIER 1</div>
+        <div class="tier-discount" id="tierDiscount">--% PREMIUM DISCOUNT</div>
+        <p class="tier-desc">Evaluates defensive cornering, proactive shift timing, and zero cold-tire loss-of-grip maneuvers.</p>
+      </div>
+
+      <div class="section-title">UNDERWRITING TELEMETRY RISK FACTORS</div>
+      <div class="ubi-factors-list">
+        <div class="ubi-factor">
+          <div class="factor-header">
+            <span>Cornering & Cold-Tire Slip Risk</span>
+            <span class="factor-grade highlight-green">Low Risk (100/100)</span>
+          </div>
+          <p class="factor-desc">Monitors roll angle rate against TPMS internal tire surface temperatures.</p>
+        </div>
+        <div class="ubi-factor">
+          <div class="factor-header">
+            <span>Panic Braking Events (&gt;0.65G)</span>
+            <span class="factor-grade highlight-green">0 Detected</span>
+          </div>
+          <p class="factor-desc">Absence of panic braking indicates proper road foresight and following distances.</p>
+        </div>
+        <div class="ubi-factor">
+          <div class="factor-header">
+            <span>High-Speed Overtakes (&gt;70 km/h @ &gt;0.4G)</span>
+            <span class="factor-grade highlight-cyan">0 Detected</span>
+          </div>
+          <p class="factor-desc">Controlled lane-change acceleration profiles without reckless surges.</p>
+        </div>
+      </div>
+
+      <div class="annual-savings-card">
+        <div class="savings-icon">💰</div>
+        <div>
+          <div class="savings-label">PROJECTED ANNUAL PREMIUM SAVINGS</div>
+          <div class="savings-amount" id="savingsAmount">₹0 / Year</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- TAB 4: PREDICTIVE MAINTENANCE -->
+    <main id="tab-maintenance" class="tab-content">
+      <div class="stress-card">
+        <div>
+          <div class="stress-title">CUMULATIVE MECHANICAL STRESS FACTOR</div>
+          <div class="stress-subtitle">Calculated from Torque Strain × Thermal Ingestion</div>
+        </div>
+        <div class="stress-val" id="stressVal">0.0</div>
+      </div>
+
+      <div class="section-title">CONDITION-BASED COMPONENT LIFE</div>
+      <div class="components-list" id="maintenanceList">
+        <!-- Dynamically rendered component life bars -->
+      </div>
+    </main>
+
+    <!-- TAB 5: SOS BLACKBOX -->
+    <main id="tab-blackbox" class="tab-content">
+      <div class="blackbox-status-card ready" id="blackboxCard">
+        <div class="bb-icon">🛡️</div>
+        <div>
+          <div class="bb-title">60-SECOND ROLLING RING BUFFER ACTIVE</div>
+          <div class="bb-desc">Continuously buffering rolling 600 frames (10Hz). Automatically locks telemetry & GPS upon >4.5G crash impact or >80° lean.</div>
+        </div>
+      </div>
+
+      <div class="section-title">INCIDENT LOGS & EMERGENCY COORDINATES</div>
+      <div class="incidents-container" id="incidentsContainer">
+        <div class="empty-incidents">
+          <div class="empty-icon">✅</div>
+          <div class="empty-text">No Crash Incidents Recorded</div>
+          <div class="empty-sub">Edge IMU is continuously monitoring G-forces & tilt.</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

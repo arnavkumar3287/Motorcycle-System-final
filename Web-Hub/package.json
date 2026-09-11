@@ -1,0 +1,13 @@
+{
+  "name": "motorcycle-system-web-hub",
+  "version": "1.0.0",
+  "description": "Interactive Live Web Hub for Motorcycle Edge AI Telemetry System",
+  "scripts": {
+    "dev": "vite --port 3000 --host",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.4.1"
+  }
+}
